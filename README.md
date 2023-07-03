@@ -29,3 +29,10 @@ cargo build
 cargo run
 
 ```
+
+# Tips
+
+- Use snake case for vars and functions
+- Last line in a function without a ';' by the end will behave as a 'return'
+- methods with a '!' at the end are 'macros': used for meta-programming, method can be called with variable number of
+  params
