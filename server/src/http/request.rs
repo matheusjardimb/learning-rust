@@ -12,10 +12,18 @@ pub struct Request<'buf> {
     method: Method,
 }
 
-impl Request {
-    fn from_byte_array(buf: &[u8]) -> Result<Self, String> {
-        return Result;
+impl<'buf> Request<'buf> {
+    pub fn path(&self) -> &str {
+        &self.path
     }
+
+    pub fn method(&self) -> &Method {
+        &self.method
+    }
+
+    // pub fn query_string(&self) -> Option<&QueryString> {
+    //     self.query_string.as_ref()
+    // }
 }
 
 impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
@@ -87,7 +95,7 @@ impl ParseError {
     }
 }
 
-impl From<Utf8Error> for MethodError {
+impl From<MethodError> for ParseError {
     fn from(_: MethodError) -> Self {
         Self::InvalidMethod
     }
