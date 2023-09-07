@@ -5,24 +5,33 @@ use std::fmt::{Debug, Display, Formatter};
 use std::str;
 use std::str::Utf8Error;
 use crate::http::method::MethodError;
+use crate::http::query_string::QueryString;
 
-pub struct Request {
-    path: String,
-    query_string: Option<String>,
+pub struct Request<'buf> {
+    path: &'buf str,
+    query_string: Option<QueryString<'buf>>,
     method: Method,
 }
 
-impl Request {
-    fn from_byte_array(buf: &[u8]) -> Result<Self, String> {
-        return Result;
+impl<'buf> Request<'buf> {
+    pub fn path(&self) -> &str {
+        &self.path
     }
+
+    pub fn method(&self) -> &Method {
+        &self.method
+    }
+
+    // pub fn query_string(&self) -> Option<&QueryString> {
+    //     self.query_string.as_ref()
+    // }
 }
 
-impl TryFrom<&[u8]> for Request {
+impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
     type Error = ParseError;
 
     // GET /search?name=abc&sort=1 HTTP/1.1
-    fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
+    fn try_from(buf: &'buf [u8]) -> Result<Self, Self::Error> {
         let request = str::from_utf8(buf).or(Err(ParseError::InvalidEncoding))?;
 
         let (method, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
@@ -36,11 +45,14 @@ impl TryFrom<&[u8]> for Request {
 
         let mut query_string = None;
         if let Some(i) = path.find('?') {
-            query_string = Some(&path[i + 1..]);
+            query_string = Some(QueryString::from(&path[i + 1..]));
             path = &path[..i];
         }
-
-        unimplemented!()
+        Ok(Self {
+            path,
+            query_string,
+            method,
+        })
     }
 }
 
@@ -84,7 +96,7 @@ impl ParseError {
     }
 }
 
-impl From<Utf8Error> for MethodError {
+impl From<MethodError> for ParseError {
     fn from(_: MethodError) -> Self {
         Self::InvalidMethod
     }
