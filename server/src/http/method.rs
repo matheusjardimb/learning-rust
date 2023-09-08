@@ -1,15 +1,16 @@
 use std::str::FromStr;
 
+#[derive(Debug)]
 pub enum Method {
     GET,
     DELETE,
     POST,
     PUT,
-    PATCH,
     HEAD,
     CONNECT,
     OPTIONS,
     TRACE,
+    PATCH,
 }
 
 impl FromStr for Method {
@@ -21,11 +22,11 @@ impl FromStr for Method {
             "DELETE" => Ok(Self::DELETE),
             "POST" => Ok(Self::POST),
             "PUT" => Ok(Self::PUT),
-            "PATCH" => Ok(Self::PATCH),
             "HEAD" => Ok(Self::HEAD),
             "CONNECT" => Ok(Self::CONNECT),
             "OPTIONS" => Ok(Self::OPTIONS),
             "TRACE" => Ok(Self::TRACE),
+            "PATCH" => Ok(Self::PATCH),
             _ => Err(MethodError),
         }
     }
